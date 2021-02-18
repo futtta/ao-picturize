@@ -16,7 +16,6 @@ add_action( 'init', function() {
             define( 'AO_IMGOPT_HOST', parse_url( autoptimizeImages::get_imgopt_host_wrapper(), PHP_URL_HOST ) );
         }
         add_filter( 'autoptimize_filter_imgopt_should_lazyload', '__return_false' );
-        add_filter( 'autoptimize_filter_imgopt_ngimg_js', '__return_empty_string' );
         add_filter( 'autoptimize_filter_imgopt_tag_postopt', 'ao_img_to_picture' );
     }
 });
@@ -32,13 +31,13 @@ function ao_img_to_picture( $tag ) {
     $picture_attributes = ao_build_picture_attributes( $attributes );
     $tmp_tag            = ao_img_prepare_for_source( $tag );
     
-    $newtag =  '<picture ' . $picture_attributes . '>';
+    $newtag  =  '<picture ' . $picture_attributes . '>';
     $newtag .= ao_picture_source_ngimg( $tmp_tag, 'avif' );
     $newtag .= ao_picture_source_ngimg( $tmp_tag, 'webp' );
     $newtag .= preg_replace( '/(id=(?:"|\').*(?:"|\'))/U', '', $tag ); // remove id, we let class, style & title stay (for now).
     $newtag .= '</picture>';
-    $newtag = preg_replace( '/\s{2,}/u', ' ', $newtag ); // remove superflous whitespace after the preg_replace.
-    $newtag = apply_filters( 'autoptimize_filter_imgopt_picture_newtag', $newtag );
+    $newtag  = preg_replace( '/\s{2,}/u', ' ', $newtag ); // remove superflous whitespace after the preg_replace.
+    $newtag  = apply_filters( 'autoptimize_filter_imgopt_picture_newtag', $newtag );
 
     return $newtag;
 }
@@ -48,7 +47,7 @@ function ao_img_prepare_for_source( $tag ) {
     if ( strpos( $tag, ' srcset=' ) === false ) {
         $newsource = str_replace( ' src=', ' srcset=', $newsource );
     }
-    $newsource = preg_replace( apply_filters( 'autoptimize_filter_imgopt_picture_source_blocklist_regex', '/\s((?:id|width|height|alt|src|class|loading)=(?:\'|").*(?:\'|"))(>)?/Um') , '$2 ', $newsource ); // remove unwanted attribs.
+    $newsource = preg_replace( apply_filters( 'autoptimize_filter_imgopt_picture_source_tag_blocklist_regex', '/\s((?:id|width|height|alt|src|class|loading)=(?:\'|").*(?:\'|"))(>)?/Um') , '$2 ', $newsource ); // remove unwanted attribs.
 
     return $newsource;      
 }
@@ -85,7 +84,7 @@ function ao_get_main_attribs( $tag ) {
 function ao_build_picture_attributes( $attributes ) {
     $picture_attribs           = '';
     $picture_attribs_blocklist = array( 'alt', 'height', 'width', 'data-lazy-src', 'data-src', 'src', 'data-lazy-srcset', 'data-srcset', 'srcset', 'data-sizes', 'sizes', 'loading' );
-    $picture_attribs_blocklist = apply_filters( 'autoptimize_filter_imgopt_picture_blocklist_array', $picture_attribs_blocklist );
+    $picture_attribs_blocklist = apply_filters( 'autoptimize_filter_imgopt_picture_tag_blocklist_array', $picture_attribs_blocklist );
     foreach ( $attributes as $attrib_name => $attrib_val ) {
         if ( ! empty( $attrib_val ) && ! in_array( $attrib_name, $picture_attribs_blocklist ) ) {
             $_attrib          = trim( $attrib_name ) . '="' . trim( $attrib_val ) . '" ';
