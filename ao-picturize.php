@@ -4,7 +4,7 @@ Plugin Name: AO picturize
 Plugin URI: http://blog.futtta.be/
 Description: AO power-up to use picture to do avif/ webp
 Author: Frank Goossens (futtta)
-Version: 0.2.0
+Version: 0.3.0
 Author URI: http://blog.futtta.be/
 */
 
