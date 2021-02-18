@@ -4,7 +4,7 @@ Plugin Name: AO picturize
 Plugin URI: http://blog.futtta.be/
 Description: AO power-up to use picture to do avif/ webp
 Author: Frank Goossens (futtta)
-Version: 0.0.1
+Version: 0.2.0
 Author URI: http://blog.futtta.be/
 */
 
@@ -18,8 +18,16 @@ add_action( 'init', function() {
         add_filter( 'autoptimize_filter_imgopt_should_lazyload', '__return_false' );
         add_filter( 'autoptimize_filter_imgopt_tag_postopt', 'ao_img_to_picture' );
     }
-});
 
+    if ( is_admin() ) {
+        require 'plugin-update-checker/plugin-update-checker.php';
+        $ao_picturize_pce_UpdateChecker = Puc_v4_Factory::buildUpdateChecker(
+            'https://github.com/futtta/ao-picturize',
+            __FILE__,
+            'ao-picturize'
+        );
+    }
+});
 
 function ao_img_to_picture( $tag ) {
     // should we check & bail if picture tag is already used? can we do that here?
