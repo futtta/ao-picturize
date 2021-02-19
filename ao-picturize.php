@@ -4,7 +4,7 @@ Plugin Name: AO picturize
 Plugin URI: http://blog.futtta.be/
 Description: AO power-up to use picture to do avif/ webp
 Author: Frank Goossens (futtta)
-Version: 0.3.0
+Version: 0.5.0
 Author URI: http://blog.futtta.be/
 */
 
@@ -27,12 +27,39 @@ add_action( 'init', function() {
             'ao-picturize'
         );
         $ao_picturize_pce_UpdateChecker->setBranch('main');
+        
+        if ( ! version_compare( AUTOPTIMIZE_PLUGIN_VERSION, '2.8.1', '>') ) { ?>
+            <div class="notice-warning notice"><p>
+            <?php
+            _e( 'The Autoptimize picturize power-up requires the latest version of the Autoptimize Beta, download it from <a href="https://github.com/futtta/autoptimize/archive/beta.zip" target="_blank">Github here</a>', 'autoptimize' );
+            ?>
+            </p></div>
+        <?php }
     }
 });
 
 function ao_img_to_picture( $tag ) {
     // should we check & bail if picture tag is already used? can we do that here?
-    if ( strpos( $tag, AO_IMGOPT_HOST ) === false ) {
+
+    static $_exclusions = null;
+    if ( null === $_exclusions ) {
+        // default excluded from being picturized.
+        $_exclusions = array( 'data:image/', 'lazyload', 'rev-slidebg' );
+
+        // and reusing user-set lazyload exclusions.
+        $imgopt_options = autoptimizeImages::fetch_options();
+        if ( array_key_exists( 'autoptimize_imgopt_text_field_5', $imgopt_options ) ) {
+            $exclude_lazyload_option = $imgopt_options['autoptimize_imgopt_text_field_5'];
+            if ( ! empty( $exclude_lazyload_option ) ) {
+                $_exclusions = array_merge( $_exclusions, array_filter( array_map( 'trim', explode( ',', $imgopt_options['autoptimize_imgopt_text_field_5'] ) ) ) );
+            }
+        }
+
+        // and finally filter for developer-initiated changes again assuming the lazyload ones apply too.
+        $_exclusions = apply_filters( 'autoptimize_filter_imgopt_lazyload_exclude_array', $_exclusions );
+    }
+
+    if ( strpos( $tag, AO_IMGOPT_HOST ) === false || str_ireplace( $_exclusions, '', $tag ) !== $tag ) {
         return $tag;
     }
 
