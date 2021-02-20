@@ -4,7 +4,7 @@ Plugin Name: AO picturize
 Plugin URI: http://blog.futtta.be/
 Description: AO power-up to use picture to do avif/ webp
 Author: Frank Goossens (futtta)
-Version: 0.5.0
+Version: 0.6.0
 Author URI: http://blog.futtta.be/
 */
 
@@ -70,10 +70,10 @@ function ao_img_to_picture( $tag ) {
     $newtag  =  '<picture ' . $picture_attributes . '>';
     $newtag .= ao_picture_source_ngimg( $tmp_tag, 'avif' );
     $newtag .= ao_picture_source_ngimg( $tmp_tag, 'webp' );
-    $newtag .= preg_replace( '/(id=(?:"|\').*(?:"|\'))/U', '', $tag ); // remove id, we let class, style & title stay (for now).
+    $newtag .= $tag; // we keep id, class & style on img tag as that is the image placeholder, based on the specs the picture/ source combo will re-populate the img with the correct source.
     $newtag .= '</picture>';
     $newtag  = preg_replace( '/\s{2,}/u', ' ', $newtag ); // remove superflous whitespace after the preg_replace.
-    $newtag  = apply_filters( 'autoptimize_filter_imgopt_picture_newtag', $newtag );
+    $newtag  = apply_filters( 'autoptimize_filter_imgopt_picture_newtag', $newtag ); // and we like our filters.
 
     return $newtag;
 }
@@ -119,7 +119,7 @@ function ao_get_main_attribs( $tag ) {
 
 function ao_build_picture_attributes( $attributes ) {
     $picture_attribs           = '';
-    $picture_attribs_blocklist = array( 'alt', 'height', 'width', 'data-lazy-src', 'data-src', 'src', 'data-lazy-srcset', 'data-srcset', 'srcset', 'data-sizes', 'sizes', 'loading' );
+    $picture_attribs_blocklist = array( 'id', 'class', 'style', 'alt', 'height', 'width', 'data-lazy-src', 'data-src', 'src', 'data-lazy-srcset', 'data-srcset', 'srcset', 'data-sizes', 'sizes', 'loading' );
     $picture_attribs_blocklist = apply_filters( 'autoptimize_filter_imgopt_picture_tag_blocklist_array', $picture_attribs_blocklist );
     foreach ( $attributes as $attrib_name => $attrib_val ) {
         if ( ! empty( $attrib_val ) && ! in_array( $attrib_name, $picture_attribs_blocklist ) ) {
