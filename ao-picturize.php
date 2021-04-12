@@ -83,7 +83,7 @@ function ao_img_prepare_for_source( $tag ) {
     if ( strpos( $tag, ' srcset=' ) === false ) {
         $newsource = str_replace( ' src=', ' srcset=', $newsource );
     }
-    $newsource = preg_replace( apply_filters( 'autoptimize_filter_imgopt_picture_source_tag_blocklist_regex', '/\s((?:id|width|height|alt|src|class|loading)=(?:\'|").*(?:\'|"))(>)?/Um') , '$2 ', $newsource ); // remove unwanted attribs.
+    $newsource = preg_replace( apply_filters( 'autoptimize_filter_imgopt_picture_source_tag_blocklist_regex', '/\s((?:id|width|height|alt|src|class|loading|style)=(?:\'|").*(?:\'|"))(>)?/Um') , '$2 ', $newsource ); // remove unwanted attribs.
 
     return $newsource;      
 }
@@ -108,6 +108,7 @@ function ao_get_main_attribs( $tag ) {
             $_attr[$attr->nodeName] = $attr->nodeValue;
         }
     } else {
+        // is this useful? as all of those except title are excluded from being addes to the <picture> tag, there is no use in extracing these?
         foreach ( array( 'id', 'class', 'title', 'style', 'alt' ) as $attrname ) {
             preg_match('/ (' . $attrname . '=(?:\'|").*(?:\'|")) /Um', $tag, $matches );
             $_attr[$attrname] = $matches[1];
